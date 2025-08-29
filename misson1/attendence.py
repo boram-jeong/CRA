@@ -22,18 +22,18 @@ def get_point_of_target_day(day_name):
         return 2
     else: return 1
 
-def update_player_dict(player_name, id_dict):
-    number_of_ids = len(id_dict)
-    if player_name not in id_dict:
+def update_player_dict(player_name, player_dict):
+    number_of_ids = len(player_dict)
+    if player_name not in player_dict:
         number_of_ids += 1
-        id_dict[player_name] = number_of_ids
-    return id_dict
+        player_dict[player_name] = number_of_ids
+    return player_dict
 
 def read_attendance_file(file_name):
     try:
         lines = []
 
-        with open("attendance_weekday_500.txt", encoding='utf-8') as f:
+        with open(file_name, encoding='utf-8') as f:
             for _ in range(500):
                 line = f.readline()
                 if not line:
@@ -56,9 +56,9 @@ def update_current_player_point(current_player_id, day, points):
 
     return points
 
-def update_attendence_list(current_player_id, day, attendence_list):
+def update_attendence_list(current_player_id, day_name, attendence_list):
     attendence_list.append([0 for _ in range(7)])
-    index = get_day_of_the_week_index(day)
+    index = get_day_of_the_week_index(day_name)
     attendence_list[current_player_id][index] += 1
 
     return attendence_list
@@ -124,11 +124,11 @@ def calculated_grade(number_of_ids, points):
             grade[player_id] = 0
     return grade
 
-def update_bonus_point(number_of_ids, dat, points):
+def update_bonus_point(number_of_ids, attendence_list, points):
     for player_id in range(1, number_of_ids + 1):
-        if dat[player_id][2] > 9:
+        if attendence_list[player_id][2] > 9:
             points[player_id] += 10
-        if dat[player_id][5] + dat[player_id][6] > 9:
+        if attendence_list[player_id][5] + attendence_list[player_id][6] > 9:
             points[player_id] += 10
 
     return points
