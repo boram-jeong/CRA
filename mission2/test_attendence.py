@@ -64,12 +64,12 @@ def test_get_point_of_target_day_Should_return_correct_point_When_day_is_given(d
 
 
 def test_update_bonus_point_Should_return_updated_points_When_attendence_list_and_points_are_given():
-    number_of_id = 3
+    player_dict = {'amy': 1, 'bori': 2, 'cat': 3}
     attendence_list = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 15, 0, 0, 0, 0], [1, 0, 0, 0, 0, 6, 7], [0, 1, 0, 0, 0, 0, 0]]
     points = [0, 45, 27, 1]
     expected_points = [0, 55, 37, 1]
 
-    assert update_bonus_point(number_of_id, attendence_list, points) == expected_points
+    assert update_bonus_point(player_dict, attendence_list, points) == expected_points
 
 
 grade_and_points_for_test = [

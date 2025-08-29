@@ -122,6 +122,7 @@ class Normal(Grade):
         print("NORMAL")
 
 def print_player_point_and_grade(player_dict, points):
+
     for player_name, player_id in player_dict.items():
         print(f"NAME : {player_name}, POINT : {points[player_id]}, GRADE : ", end="")
         if points[player_id] >= 50:
@@ -131,7 +132,8 @@ def print_player_point_and_grade(player_dict, points):
         else:
             Normal().print()
 
-def update_bonus_point(number_of_ids, attendence_list, points):
+def update_bonus_point(player_dict, attendence_list, points):
+    number_of_ids = len(player_dict)
     for player_id in range(1, number_of_ids + 1):
         if attendence_list[player_id][2] > 9:
             points[player_id] += 10
@@ -146,9 +148,8 @@ def attendence_manager(file_name):
         player_dict = get_player_dict(player_attendence_information)
         attendence_list = get_attendence_list(player_attendence_information, player_dict)
         points = get_points(player_attendence_information, player_dict)
+        updated_points = update_bonus_point(player_dict, attendence_list, points)
 
-        number_of_ids = len(player_dict)
-        updated_points = update_bonus_point(number_of_ids, attendence_list, points)
         print_player_point_and_grade(player_dict, points)
         print_removed_player(attendence_list, points, player_dict)
 
@@ -158,5 +159,4 @@ def attendence_manager(file_name):
     return player_dict, updated_points
 
 if __name__ == "__main__":
-    file_name = "attendance_weekday_500.txt"
-    attendence_manager(file_name)
+    attendence_manager("attendance_weekday_500.txt")
