@@ -1,8 +1,3 @@
-# dat[사용자ID][요일]
-grade = [0] * 100
-names = [''] * 100
-
-
 def get_day_of_the_week_index(day_name):
     if day_name == "monday":
         return 0
@@ -27,16 +22,12 @@ def get_point_of_target_day(day_name):
         return 2
     else: return 1
 
-
-
-
-
 def update_player_dict(player_name, id_dict):
     number_of_ids = len(id_dict)
     if player_name not in id_dict:
         number_of_ids += 1
         id_dict[player_name] = number_of_ids
-        names[number_of_ids] = player_name
+        #names[number_of_ids] = player_name
     return id_dict
 
 def read_attendance_file(file_name):
@@ -59,14 +50,12 @@ def read_attendance_file(file_name):
     except Exception as e:
         raise Exception(f"read error: {e}")
 
-
 def update_current_player_point(current_player_id, day, points):
     points.append(0)
     add_point = get_point_of_target_day(day)
     points[current_player_id] += add_point
 
     return points
-
 
 def update_attendence_list(current_player_id, day, attendence_list):
     attendence_list.append([0 for _ in range(7)])
@@ -75,7 +64,6 @@ def update_attendence_list(current_player_id, day, attendence_list):
 
     return attendence_list
 
-
 def get_attendence_list(player_attendence_information, updated_player_dict):
     attendence_list = [[0 for _ in range(7)]]
     for each_player_information in player_attendence_information:
@@ -84,52 +72,36 @@ def get_attendence_list(player_attendence_information, updated_player_dict):
 
     return attendence_list
 
-
-def get_attendence_list(player_attendence_information, updated_player_dict):
-    attendence_list = [[0 for _ in range(7)]]
+def get_points(player_attendence_information, updated_player_dict):
+    points = [0]
     for each_player_information in player_attendence_information:
         name, day = each_player_information[0], each_player_information[1]
-        attendence_list = update_attendence_list(updated_player_dict[name], day, attendence_list)
+        points = update_current_player_point(updated_player_dict[name], day, points)
 
-    return attendence_list
+    return points
 
-def input_file():
+def get_player_dict(player_attendence_information):
     player_dict = {}
-    try:
-        player_attendence_information = read_attendance_file("attendance_weekday_500.txt")
-        attendence_list = [[0 for _ in range(7)]]
-        points = [0]
-        for each_player_information in player_attendence_information:
-            name, day = each_player_information[0], each_player_information[1]
-            updated_player_dict = update_player_dict(name, player_dict)
-            attendence_list = update_attendence_list(updated_player_dict[name], day, attendence_list)
-            points = update_current_player_point(updated_player_dict[name], day, points)
+    for each_player_information in player_attendence_information:
+        name, day = each_player_information[0], each_player_information[1]
+        updated_player_dict = update_player_dict(name, player_dict)
 
+    return updated_player_dict
 
+def print_removed_player(attendence_list, grade, player_dict):
+    print("\nRemoved player")
+    print("==============")
+    for player_name, player_id in player_dict.items():
+        wednesday_index = get_day_of_the_week_index('wednesday')
+        saturday_index = get_day_of_the_week_index('saturday')
+        sunday_index = get_day_of_the_week_index('sunday')
 
-
-        number_of_ids = len(updated_player_dict)
-
-        updated_points = update_bonus_point(number_of_ids, attendence_list, points)
-        updated_grade = calculated_grade(number_of_ids, updated_points)
-        print_player_point_and_grade(updated_player_dict, updated_grade, points)
-
-        print("\nRemoved player")
-        print("==============")
-        for player_id in range(1, number_of_ids + 1):
-
-            wednesday_index = get_day_of_the_week_index('wednesday')
-            saturday_index = get_day_of_the_week_index('saturday')
-            sunday_index = get_day_of_the_week_index('sunday')
-
-            number_of_attendence_for_wednesday = attendence_list[player_id][wednesday_index]
-            number_of_attendence_for_weekend = attendence_list[player_id][saturday_index] + attendence_list[player_id][sunday_index]
-            if grade[player_id] not in (1, 2) and number_of_attendence_for_wednesday == 0 and number_of_attendence_for_weekend == 0:
-                print(names[player_id])
-
-    except FileNotFoundError:
-        print("파일을 찾을 수 없습니다.")
-
+        number_of_attendence_for_wednesday = attendence_list[player_id][wednesday_index]
+        number_of_attendence_for_weekend = attendence_list[player_id][saturday_index] + attendence_list[player_id][
+            sunday_index]
+        if grade[player_id] not in (1,
+                                    2) and number_of_attendence_for_wednesday == 0 and number_of_attendence_for_weekend == 0:
+            print(player_name)
 
 def print_player_point_and_grade(player_dict, grade, points):
     for player_name, player_id in player_dict.items():
@@ -140,7 +112,6 @@ def print_player_point_and_grade(player_dict, grade, points):
             print("SILVER")
         else:
             print("NORMAL")
-
 
 def calculated_grade(number_of_ids, points):
     grade = [0]
@@ -154,7 +125,6 @@ def calculated_grade(number_of_ids, points):
             grade[player_id] = 0
     return grade
 
-
 def update_bonus_point(number_of_ids, dat, points):
     for player_id in range(1, number_of_ids + 1):
         if dat[player_id][2] > 9:
@@ -164,6 +134,21 @@ def update_bonus_point(number_of_ids, dat, points):
 
     return points
 
+def attendence_manager():
+    try:
+        player_attendence_information = read_attendance_file("attendance_weekday_500.txt")
+        player_dict = get_player_dict(player_attendence_information)
+        attendence_list = get_attendence_list(player_attendence_information, player_dict)
+        points = get_points(player_attendence_information, player_dict)
+
+        number_of_ids = len(player_dict)
+        updated_points = update_bonus_point(number_of_ids, attendence_list, points)
+        updated_grade = calculated_grade(number_of_ids, updated_points)
+        print_player_point_and_grade(player_dict, updated_grade, points)
+        print_removed_player(attendence_list, updated_grade, player_dict)
+
+    except FileNotFoundError:
+        print("파일을 찾을 수 없습니다.")
 
 if __name__ == "__main__":
-    input_file()
+    attendence_manager()
