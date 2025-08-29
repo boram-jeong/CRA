@@ -1,5 +1,4 @@
-from logging import exception
-
+from abc import ABC, abstractmethod
 
 def get_day_of_the_week_index(day_name):
     if day_name == "monday":
@@ -91,7 +90,7 @@ def get_player_dict(player_attendence_information):
 
     return updated_player_dict
 
-def print_removed_player(attendence_list, grade, player_dict):
+def print_removed_player(attendence_list, points, player_dict):
     print("\nRemoved player")
     print("==============")
     for player_name, player_id in player_dict.items():
@@ -102,31 +101,35 @@ def print_removed_player(attendence_list, grade, player_dict):
         number_of_attendence_for_wednesday = attendence_list[player_id][wednesday_index]
         number_of_attendence_for_weekend = attendence_list[player_id][saturday_index] + attendence_list[player_id][
             sunday_index]
-        if grade[player_id] not in (1,
-                                    2) and number_of_attendence_for_wednesday == 0 and number_of_attendence_for_weekend == 0:
+        if points[player_id] < 30 and number_of_attendence_for_wednesday == 0 and number_of_attendence_for_weekend == 0:
             print(player_name)
 
-def print_player_point_and_grade(player_dict, grade, points):
+class Grade(ABC):
+    @abstractmethod
+    def print(self):
+        pass
+
+class Gold(Grade):
+    def print(self):
+        print("GOLD")
+
+class Silver(Grade):
+    def print(self):
+        print("SILVER")
+
+class Normal(Grade):
+    def print(self):
+        print("NORMAL")
+
+def print_player_point_and_grade(player_dict, points):
     for player_name, player_id in player_dict.items():
         print(f"NAME : {player_name}, POINT : {points[player_id]}, GRADE : ", end="")
-        if grade[player_id] == 1:
-            print("GOLD")
-        elif grade[player_id] == 2:
-            print("SILVER")
-        else:
-            print("NORMAL")
-
-def calculated_grade(number_of_ids, points):
-    grade = [0]
-    for player_id in range(1, number_of_ids + 1):
-        grade.append(0)
         if points[player_id] >= 50:
-            grade[player_id] = 1
+            Gold().print()
         elif points[player_id] >= 30:
-            grade[player_id] = 2
+            Silver().print()
         else:
-            grade[player_id] = 0
-    return grade
+            Normal().print()
 
 def update_bonus_point(number_of_ids, attendence_list, points):
     for player_id in range(1, number_of_ids + 1):
@@ -146,14 +149,13 @@ def attendence_manager(file_name):
 
         number_of_ids = len(player_dict)
         updated_points = update_bonus_point(number_of_ids, attendence_list, points)
-        updated_grade = calculated_grade(number_of_ids, updated_points)
-        print_player_point_and_grade(player_dict, updated_grade, points)
-        print_removed_player(attendence_list, updated_grade, player_dict)
+        print_player_point_and_grade(player_dict, points)
+        print_removed_player(attendence_list, points, player_dict)
 
     except Exception as e:
         raise Exception(f"attendence_manager_has_error: {e}")
 
-    return player_dict, updated_points, updated_grade
+    return player_dict, updated_points
 
 if __name__ == "__main__":
     file_name = "attendance_weekday_500.txt"
