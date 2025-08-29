@@ -27,7 +27,6 @@ def update_player_dict(player_name, id_dict):
     if player_name not in id_dict:
         number_of_ids += 1
         id_dict[player_name] = number_of_ids
-        #names[number_of_ids] = player_name
     return id_dict
 
 def read_attendance_file(file_name):
